@@ -314,6 +314,8 @@ def signUp(request):
 
 
 def agencyProfile(request, uname=None):
+
+
     delete = request.GET.get('delete', 0)
 
     if delete != 0:
@@ -375,8 +377,24 @@ def agencyProfile(request, uname=None):
             volunteer_only = True
         else:
             volunteer_only = False
+
+        is_follower = False
+
+        prof = Profile.objects.get(user=request.user)
+
+        follow = request.GET.get('follow', 0)
+        if follow != 0:
+             if(agency in prof.agencies_following.all()):
+                 profile.agencies_following.remove(agency)
+             else:
+                 profile.agencies_following.add(agency)
+
+        if(agency in prof.agencies_following.all()):
+            is_follower = True
+
         context = {
             "title": title,
+            "is_follower": is_follower,
             "volunteer_only": volunteer_only,
             "is_user": checkAuth(request),
             "user": request.user,
@@ -454,6 +472,8 @@ def profile(request, username=None):
     if checkAuth(request) == False:
         return HttpResponseRedirect("/")
 
+
+    is_follower = False
     has_posts = False
     posts = []
     has_agency = False
@@ -486,7 +506,40 @@ def profile(request, username=None):
                 has_posts = False
 
         else:
+
            is_personal_profile = False
+           profile = Profile.objects.get(user=user_info)
+           prof = Profile.objects.get(user=request.user)
+
+           delete = request.GET.get('follow', 0)
+           if delete != 0:
+                if(prof in profile.followers.all()):
+                    profile.followers.remove(prof)
+                    prof.following.remove(profile)
+                else:
+                    profile.followers.add(prof)
+                    prof.following.add(profile)
+           if(prof in profile.followers.all()):
+               is_follower = True
+
+           print(profile.number_of_donations)
+           print(profile.number_of_volunteering_participations)
+           all_agencies = Agencies.objects.all()
+           for agency in all_agencies:
+               if user_info in agency.admin_users.all():
+                   has_agency = True
+                   user_agency.append(agency)
+           user_volunteering = Volunteering.objects.all()
+           for v in user_volunteering:
+               if user_info in v.volunteers.all():
+                   has_event = True
+                   user_events.append(v)
+           try:
+               posts = Social_Media_Post.objects.filter(author=user_info).order_by('-date_posted')
+               if posts:
+                   has_posts = True
+           except:
+               has_posts = False
 
         is_an_account = True
         context = {
@@ -496,6 +549,7 @@ def profile(request, username=None):
             "has_posts": has_posts,
             "posts": posts,
             "username": username,
+            "is_follower": is_follower,
             "has_event": has_event,
             "user_events": user_events,
             "user_agency": user_agency,
@@ -1208,3 +1262,47 @@ def donationPredictor(request):
         "df": df8,
     }
     return render(request, "main/donationPredictor.html", context=context)
+
+
+
+def followingFeed(request):
+    users = Profile.objects.filter(user=request.user).values_list('following')
+    has_user_posts = False
+    has_agency_posts = False
+    user_posts = []
+    agency_posts = []
+    agencies_followed = Profile.objects.filter(user=request.user).values_list('agencies_following')
+    print(agencies_followed)
+    for u in users:
+        print(Profile.objects.filter(id=u[0]))
+        prof = User.objects.filter(profile=u[0])[0]
+        #us = User.objects.filter(username=prof.user.username)
+        usp = Social_Media_Post.objects.filter(author=prof)
+
+        for p in usp:
+            print(p)
+            user_posts.append(p)
+
+    for a in agencies_followed:
+        asp = Agency_Social_Media_Post.objects.filter(author=a)
+        for a in asp:
+            print(a)
+            agency_posts.append(a)
+
+
+    if user_posts:
+        has_user_posts = True
+        user_posts = sorted(user_posts, key=lambda Social_Media_Post: Social_Media_Post.date_posted, reverse=True)
+    if agency_posts:
+        has_agency_posts = True
+        agency_posts = sorted(agency_posts, key=lambda Agency_Social_Media_Post: Agency_Social_Media_Post.date_posted, reverse=True)
+
+
+    context = {
+        "is_user": checkAuth(request),
+        "user_posts": user_posts,
+        "agency_posts": agency_posts,
+        "has_user_posts": has_user_posts,
+        "has_agency_posts": has_agency_posts,
+    }
+    return render(request, "main/followingFeed.html", context=context)

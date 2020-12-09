@@ -8,6 +8,7 @@
    </div>
    {% endif %}
    {% if is_agency %}
+
    <div class="card col-5">
       <div class="profileImage"></div>
       <img src="{{ agency.picture.url }}" style="width:100%">
@@ -17,7 +18,19 @@
       <p class="title">{{ agency.phone }}</p>
       <p><a href="{{ agency.url}}" class="profileCardContact">Visit Agency Website</a></p>
    </div>
+
    <div class="col-5">
+     {% if not is_follower %}
+     <form method='get' action=''>
+       <button type="submit" value="Follow" name="follow" class="btn mb-2 btn-outline-info">Follow</button>
+       </form>
+     {% else %}
+     <form method='get' action=''>
+       <button type="submit" value="Unfollow" name="follow" class="btn mb-2 btn-outline-info">Unfollow </button>
+       </form>
+     {% endif %}
+
+     
      {% if requests %}
       <div class="container-fluid">
          <div align="center">

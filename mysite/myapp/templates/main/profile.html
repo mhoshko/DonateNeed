@@ -29,10 +29,23 @@
   <div class="col-5">
     <br>
     {% if not is_personal_profile %}
-      <h3>View Their Agency Page:</h3>
-      {% for agency in user_agency %}
-      <a href="/agencyProfile/{{ agency.username }}" class="btn mb-2 btn-outline-info">{{ agency }}</a>
-      {% endfor %}
+      {% if not is_follower %}
+      <form method='get' action=''>
+        <button type="submit" value="Follow" name="follow" class="btn mb-2 btn-outline-info">Follow</button>
+        </form>
+      {% else %}
+      <form method='get' action=''>
+        <button type="submit" value="Unfollow" name="follow" class="btn mb-2 btn-outline-info">Unfollow </button>
+        </form>
+      {% endif %}
+
+
+      {% if has_agency %}
+        <h3>View Their Agency Page:</h3>
+        {% for agency in user_agency %}
+          <a href="/agencyProfile/{{ agency.username }}" class="btn mb-2 btn-outline-info">{{ agency }}</a>
+        {% endfor %}
+      {% endif %}
     {% elif is_personal_profile %} <!-- end of not personal profile, beginning of if true-->
     {% if has_agency %}
       <h3>View Your Agency Page(s):</h3>
@@ -43,9 +56,9 @@
       <h3>Don't have an agency? Create yours here:</h3>
       <a href="{% url 'agencySignUp' %}" class="btn mb-2 btn-outline-info">Upload Your Agency's Info</a>
     {% endif %} <!-- end of has_agency -->
-
+    {% endif %}
     {% if has_event %}
-      <h3>Your Volunteering Events: </h3>
+      <h3>Registered Volunteering Events: </h3>
 
       <table class = "table table-bordered table-hover">
          <tr>
@@ -55,7 +68,6 @@
            <th>Agency</th>
            <th>Cause</th>
            <th>Progress toward Volunteer Goal</th>
-           <th></th>
          </tr>
          {% for event in user_events %}
          <tr>
@@ -77,20 +89,6 @@
 
     {% endif %}
 
-    {% if has_posts %}
-
-
-      {% for post in posts %}
-        {% if post.type == "volunteer" %}
-        <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>{{post.author}} pledged to attend <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}'s'</a> volunteering event for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> happening on {{post.date_posted}}</p>
-
-        {% else %}
-        <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>{{post.author}} donated to help <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> on {{post.date_posted}}</p>
-
-        {% endif %}
-      {% endfor %}
-
-    {% endif %}
 
 
 
@@ -100,17 +98,29 @@
 
     {% endif %} <!-- end of if is_personal_profile -->
 
+        {% if has_posts %}
+
+
+        {% for post in posts %}
+          {% if post.type == "volunteer" %}
+          <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>{{post.author}} pledged to attend <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}'s'</a> volunteering event for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> happening on {{post.date_posted}}</p>
+
+          {% else %}
+          <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>{{post.author}} donated to help <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> on {{post.date_posted}}</p>
+
+          {% endif %}
+        {% endfor %}
+
+      {% endif %}
     {% elif not is_an_account %}  <!-- end of if account, beginning of not account  -->
       <a href="{% url '' %}" class="btn mb-2 btn-outline-info">This user does not exist. Return to the home page.</a>
     {% endif %}  <!-- end of if not account -->
 
 
-    {% elif not is_user %}  <!-- end of if user, beginning of not user  -->
-      <a href="{% url 'login' %}" class="btn mb-2 btn-outline-info">Log In Here to be able to View This User</a>
-    {% endif %}  <!-- end of if not user  -->
   </div>
 </div>
 </div>
+
 
 
 
