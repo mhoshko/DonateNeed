@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% load static %}
-
 {% block content %}
 <!-- <form class="form-inline first-element">
    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -10,7 +9,7 @@
 
 <div class="container first-element">
 <br>
-  <h2>Disaster Relief Agencies</h2>
+  <div class="text-center"><h2>Active Organizations</h2></div>
   <br>
   <div class="container">
      <div class = "col-small">
@@ -29,7 +28,7 @@
     <div class="card-columns p-2">
       {% for agency in agencies %}
       <div class="card">
-        <img class="card-img-top night" src="{{ agency.picture.url }}" onerror="this.style.display='none'">
+        <img class="card-img-top  night" src="{{ agency.picture.url }}" onerror="this.style.display='none'">
         <div class="text">
           <h5>{{ agency.name }}</h5>
           <p>{{ agency.address }}</p>
@@ -46,7 +45,7 @@
       {% endfor %}
     </div>
     <div class="text-center">
-    <a href="{% url 'agencySignUp' %}" class="btn mb-2 btn-outline-info">Is your agency not listed? Sign up your agency here</a>
+    <a href="{% url 'agencySignUp' %}" class="btn mb-2 btn-outline-info">Is your organization not listed? Sign up your organization here</a>
     </div>
   </div>
 </div>

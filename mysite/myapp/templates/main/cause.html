@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+<br>
 <div class="container-fluid profileCard first-element">
 	<div class="row">
 		{% if is_user %}
@@ -19,7 +20,7 @@
 </div>
 <h6>   &emsp;Filters</h6>
 <form method="POST">
- Agency
+ Organization
 {% csrf_token %}
 <select name="agency_id">
 	<option value="">None</option>
@@ -42,7 +43,7 @@
   <th>Amount Fulfilled</th>
   <th>Date Requested</th>
   <th>Completed</th>
-	<th>Agency</th>
+	<th>Organization</th>
 	<th>Progress</th>
 	<th></th>
 </tr>
@@ -81,7 +82,7 @@
 		 <th>Number of Requested Volunteers</th>
 		 <th>Date</th>
 		 <th>Location</th>
-		 <th>Agency</th>
+		 <th>Organization</th>
 		 <th>Progress toward Volunteer Goal</th>
 		 <th></th>
 	 </tr>

@@ -5,7 +5,7 @@
 <div class="container first-element">
   <br>
   <div class="row justify-content-md-left align-items-start">
-    <h3>Add Your Agency's Page to Your Profile</h3>
+    <h3>Add Admins to your Organization</h3>
   </div>
   <form action="{% url 'addAgency' username %}" method="post">
     {% csrf_token %}
@@ -16,7 +16,7 @@
         {{ form.as_p }}
       </div>
 
-      <input type="submit" class="button expanded" value="Add Agency" />
+      <input type="submit" class="button expanded" value="Add Admin" />
   </form>
   <br>
 </div>

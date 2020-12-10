@@ -297,6 +297,10 @@ a:hover
   font-family: "Times New Roman", Times, serif;
 }
 
+.profileCardContact:hover {
+  color: #0E390E;
+}
+
 
 .lol {
   z-index:3;
@@ -359,7 +363,11 @@ a:hover
   outline-color: #124702;
 }
 
-.btn-outline-info:hover {
+.btn-outline-info:hover,
+.btn-outline-info:focus,
+.btn-outline-info:active,
+.btn-outline-info.active,
+.open .dropdown-toggle.btn-outline-info {
   background: #ffd500;
   border-color: #ffd500;
   outline-color: #ffd500;
@@ -370,4 +378,17 @@ a:hover
 .bg-info {
   color: #0E390E;
   background-color: #0E390E;
+}
+
+/* .btn-outline-info:active:focus {
+  background: #ffd500;
+  border-color: #ffd500;
+  outline-color: #ffd500;
+  color: #124702;
+} */
+
+.btn-outline-info:active,
+.btn-outline-info.active,
+.open .dropdown-toggle.btn-outline-info {
+  background-image: none;
 }

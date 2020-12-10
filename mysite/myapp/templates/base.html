@@ -17,9 +17,9 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <link rel="stylesheet" href="{% static "css/style.css" %}">
-    {% block css %}
 
+    {% block css %}
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
     {% endblock %}
 </head>
 <body>
@@ -37,10 +37,11 @@
 
       <div class="navbar-nav w-100 order-1 order-md-0">
 
-        <a class="nav-item nav-link text-light"  href="{% url 'trending' %}">Trending News</a>
-        <a class="nav-item nav-link text-light"  href="{% url 'agencies' %}">Agencies</a>
+        <a class="nav-item nav-link text-light"  href="{% url 'agencies' %}">Organizations</a>
         <a class="nav-item nav-link text-light"  href="{% url 'activeCauses' %}">Active Causes</a>
         <a class="nav-item nav-link text-light"  href="{% url 'activeVolunteerRequests' %}">Volunteering</a>
+        <a class="nav-item nav-link text-light"  href="{% url 'activeDonations' %}">Donate Here</a>
+        <a class="nav-item nav-link text-light"  href="{% url 'followingFeed' %}">Activity Feed</a>
 
         <div class="ml-auto px-auto">
 
@@ -68,7 +69,7 @@
               <a class="dropdown-item" href="/agencyProfile/{{ user.profile.agencies.username }}">Your Organization</a>
               {% endif %}
               <a class="dropdown-item" href="{% url 'createProfile' %}">Update Your Profile</a>
-              <a class="dropdown-item" href="{% url 'agencySignUp' %}">Create Agency</a>
+              <a class="dropdown-item" href="{% url 'agencySignUp' %}">Create Organization</a>
 
             </div>
 
@@ -96,25 +97,34 @@
 <footer class="footer mt-auto">
   <p style="color: #228b22;">Donate Need</p>
   <ul>
+
+    <li><a href="{% url 'agencies' %}"style="color:#FFFFFF;"><font size="-1">Organizations Archive</font></a></li>
+    <li><a href="{% url 'activeCauses' %}"style="color:#FFFFFF;"><font size="-1">Cause Archive</font></a></li>
+        {% if is_user %}
+    <li><a href="{% url 'donationPredictor' %}"style="color:#FFFFFF;"><font size="-1">Donation Predictor</font></a></li>
+
+  </ul>
+  <ul>
+
+    <li><a href="{% url 'activeDonations' %}"style="color:#FFFFFF;"><font size="-1">Donate Here</font></a></li>
+    <li><a href="{% url 'followingFeed' %}"style="color:#FFFFFF;"><font size="-1">Activity Feed</font></a></li>
     <li><a href="{% url 'trending' %}"style="color:#FFFFFF;"><font size="-1">Trending News</font></a></li>
-    <li><a href="{% url 'agencies' %}"style="color:#FFFFFF;"><font size="-1">Agencies Archive</font></a></li>
+
+  </ul>
+    <ul>
+      <li><a href="{% url 'createProfile' %}"style="color:#FFFFFF;"><font size="-1">Update Your Profile</font></a></li>
+      <li><a href="{% url 'agencySignUp' %}"style="color:#FFFFFF;"><font size="-1">Sign Up Your Organization</font></a></li>
+      <li><a href="{% url 'createCause' %}"style="color:#FFFFFF;"><font size="-1">Establish a Cause</font></a></li>
+    </ul>
+
+    {% endif %}
+  </ul>
+    <ul>
     <li><a href="{% url 'about' %}"style="color:#FFFFFF;"><font size="-1">About Us</font></a></li>
     {% if not is_user %}
       <li><a href="{% url 'signUp' %}"style="color:#FFFFFF;"><font size="-1">Sign Up</font></a></li>
     {% endif %}
   </ul>
-    {% if is_user %}
-    <ul>
-      <li><a href="{% url 'createProfile' %}"style="color:#FFFFFF;"><font size="-1">Update Your Profile</font></a></li>
-      <li><a href="{% url 'agencySignUp' %}"style="color:#FFFFFF;"><font size="-1">Sign Up Your Agency</font></a></li>
-      <li><a href="{% url 'donationPredictor' %}"style="color:#FFFFFF;"><font size="-1">Donation Predictor</font></a></li>
-    </ul>
-    <ul>
-      <li><a href="{% url 'createCause' %}"style="color:#FFFFFF;"><font size="-1">Establish a Cause</font></a></li>
-      <li><a href="{% url 'activeDonations' %}"style="color:#FFFFFF;"><font size="-1">Active Donation Requests</font></a></li>
-      <li><a href="{% url 'followingFeed' %}"style="color:#FFFFFF;"><font size="-1">Activity Feed</font></a></li>
-    </ul>
-    {% endif %}
   <form method="GET" action='{% url "search" %}' class="navbar-form ml-auto form-inline px-auto lol1" >
    <div class="form-group">
      <input type="text" value="{{request.GET.q}}" name="q" class="form-control search-field" placeholder="Search">

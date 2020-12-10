@@ -10,8 +10,7 @@
    {% if is_agency %}
 
    <div class="card col-5">
-      <div class="profileImage"></div>
-      <img src="{{ agency.picture.url }}" style="width:100%">
+     <img class="card-img-top  night" src="{{ agency.picture.url }}" style="width:100%">
       <h1>{{ agency.name }}</h1>
       <p class="title">{{ agency.email }}</p>
       <p class="title">{{ agency.address }}</p>
@@ -29,6 +28,11 @@
    </div>
 
    <div class="col-sm">
+     {% if volunteer_only %}
+     <div class="text-center">
+      <h3>Disclaimer: {{agency.name}} is a volunteer only organization that does not accept physical donations.</h3>
+      </div>
+     {% endif %}
      {% if requests %}
       <div class="container-fluid">
          <div align="center">
@@ -65,7 +69,8 @@
 {% if not volunteer_only %}
 <div class="container">
   {% if not requests %}
-  <p>{{agency}} currently has no requests for donations</p>
+  <br>
+    <div class="text-center"><h6>{{agency}} currently has no open requests for donations</h6></div>
   {% else %}
     <br>
     <br>
@@ -81,7 +86,7 @@
         <table class = "table table-bordered table-hover">
            <tr>
               <th>Item</th>
-              <th>Amount Total</th>
+              <th>Amount Requested</th>
               <th>Amount Fulfilled</th>
               <th>Cause</th>
               <th>Date Requested</th>
@@ -111,7 +116,9 @@
               </td>
               {% else %}
               <td>
+                {% if request.amount_fulfilled != request.amount_total %}
                  <a href="/finalSubmitDonation/{{ request.id }}/" class = "btn mb-2 btn-outline-info">Donate Item</a>
+                 {% endif %}
               </td>
               {% endif %}
            </tr>
@@ -122,17 +129,24 @@
      <a href = "{% url 'agencyRequestedDonations' username %}" class="btn mb-2 btn-outline-info">View all of {{agency}}'s Requested Donations</a>
 
   {% endif %}
+
   {% if is_admin %}
-  <a href = "{% url 'addRequests' username %}" class="btn mb-2 btn-outline-info">Add Request</a>
+  <div class="text-center"><a href = "{% url 'addRequests' username %}" class="btn mb-2 btn-outline-info">Add Request</a></div>
   {% endif %}
 
  {% endif %}
+
 </div>
 
 
 <div class="container">
+  {% if agency.monetary_donation_url %}
+   <div class="text-center"><h6>Interested in making a monetary donation to {{agency.name}}? <a href = "{{agency.monetary_donation_url}}" class="btn mb-2 btn-outline-info">Visit here</a></h6></div>
+  {% endif %}
+  <br>
  {% if not volunteering_request %}
- <p>{{agency}} currently has no requests for volunteers</p>
+ <br>
+  <div class="text-center"><h6>{{agency}} currently has no open requests for volunteers</h6></div>
  {% else %}
  <br>
  <br>
@@ -167,7 +181,9 @@
           <a href="#requests" class = "btn mb-2 btn-outline-info" onclick="confirmDeleteModal({{request.id}})">Delete Request</a>
        </td>
        {% else %}
+          {% if request.amount_fulfilled != request.amount_total %}
          <td><a href="/PledgeToVolunteer/{{ request.id }}/" class = "btn mb-2 btn-outline-info">Pledge to Volunteer</a></td>
+         {% endif %}
          {% endif %}
 
     </tr>
@@ -180,8 +196,12 @@
  <a href = "{% url 'agencyRequestedVolunteers' username %}" class="btn mb-2 btn-outline-info">View all of {{agency}}'s Requests for Volunteers</a>
 {% endif %}
 
+{% if agency.volunteer_url %}
+  <div class="text-center"><h6>Interested in other volunteer options with {{agency.name}}? <a href = "{{agency.volunteer_url}}" class="btn mb-2 btn-outline-info">Visit here</a></h6></div>
+{% endif %}
+
  {% if is_admin %}
- <a href = "{% url 'addVolunteerRequest' username %}" class="btn mb-2 btn-outline-info">Add Volunteer Request</a>
+ <div class="text-center"><a href = "{% url 'addVolunteerRequest' username %}" class="btn mb-2 btn-outline-info">Add Volunteer Request</a></div>
 
 
  <!-- <div class="container-fluid justify-content-center"> -->
@@ -190,10 +210,10 @@
     <div class="card col-5 mx-auto">
 
     <h2>Administration</h2>
-    <a href="/addAgency/{{username}}" class ="btn mb-2 btn-outline-info">Add other admin users to this agency</a>
-    <a href="/pledgeSupport/{{username}}" class ="btn mb-2 btn-outline-info">Add supported causes to this agency</a>
-
+    <a href="/addAgency/{{username}}" class ="btn mb-2 btn-outline-info">Add other admin users to this organization</a>
+    <a href="/pledgeSupport/{{username}}" class ="btn mb-2 btn-outline-info">Add supported causes to this organization</a>
     </div>
+    <br>
   {% endif %}
 
 

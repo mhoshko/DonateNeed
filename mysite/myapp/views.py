@@ -479,7 +479,42 @@ def profile(request, username=None):
     if checkAuth(request) == False:
         return HttpResponseRedirect("/")
 
+    profile = Profile.objects.get(user=request.user)
+    all_profiles = models.Profile.objects.exclude(user=request.user)
+    number_of_profiles = all_profiles.count()
 
+    denominator = number_of_profiles+1
+    num_donations_numerator = 0
+    num_volunteer_numerator = 0
+    num_items_numerator = 0
+    num_cause_numerator = 0
+    num_agency_numerator = 0
+
+    number_of_donations = profile.number_of_donations
+    number_of_volunteering_participations = profile.number_of_volunteering_participations
+    number_of_items_donated = profile.number_of_items_donated
+    number_of_causes_contributed_to = profile.number_of_causes_contributed_to.count()
+    number_of_agencies_contributed_to = profile.number_of_agencies_contributed_to.count()
+
+    for p in all_profiles:
+        if p.number_of_donations <= number_of_donations:
+            num_donations_numerator += 1
+        if p.number_of_volunteering_participations <= number_of_volunteering_participations:
+            num_volunteer_numerator += 1
+        if p.number_of_items_donated <= number_of_items_donated:
+            num_items_numerator += 1
+        if p.number_of_causes_contributed_to.count() <= number_of_causes_contributed_to:
+            num_cause_numerator += 1
+        if p.number_of_agencies_contributed_to.count() <= number_of_agencies_contributed_to:
+            num_agency_numerator += 1
+
+    num_donations_percentile = round(num_donations_numerator*100/denominator, 2)
+    num_items_percentile = round(num_items_numerator*100/denominator, 2)
+    num_volunteer_percentile = round(num_volunteer_numerator*100/denominator, 2)
+    num_cause_percentile = round(num_cause_numerator*100/denominator, 2)
+    num_agency_percentile = round(num_agency_numerator*100/denominator, 2)
+
+    #or prof in
 
     is_follower = False
     has_posts = False
@@ -494,11 +529,6 @@ def profile(request, username=None):
             is_personal_profile = True
             user = request.user
             profile = Profile.objects.get(user=request.user)
-            number_of_donations = profile.number_of_donations
-            number_of_volunteering_participations = profile.number_of_volunteering_participations
-            number_of_items_donated = profile.number_of_items_donated
-            number_of_causes_contributed_to = profile.number_of_causes_contributed_to.count()
-            number_of_agencies_contributed_to = profile.number_of_agencies_contributed_to.count()
             all_agencies = Agencies.objects.all()
             for agency in all_agencies:
                 if request.user in agency.admin_users.all():
@@ -571,6 +601,11 @@ def profile(request, username=None):
             "user_agency": user_agency,
             "is_an_account":is_an_account,
             "user_info": user_info,
+            "num_volunteer_percentile": num_volunteer_percentile,
+            "num_donations_percentile": num_donations_percentile,
+            "num_cause_percentile": num_cause_percentile,
+            "num_agency_percentile": num_agency_percentile,
+            "num_items_percentile": num_items_percentile,
             "has_agency": has_agency,
             "is_personal_profile": is_personal_profile,
             "number_of_donations": number_of_donations,
@@ -595,8 +630,9 @@ def createProfile(request):
 
     user = authenticate(request, is_user=is_user, password=passw)
     instance  = get_object_or_404(Profile, user=request.user)
+    data = {'city': instance.city, 'picture': instance.picture, 'bio': instance.bio}
     if request.method == "POST":
-        form_instance = forms.ProfileForm(request.POST, request.FILES, instance=instance)
+        form_instance = forms.ProfileForm(request.POST, request.FILES, initial=data, instance=instance)
         if form_instance.is_valid():
             instance = form_instance.save(commit=False)
             instance.user = request.user
@@ -604,7 +640,7 @@ def createProfile(request):
             instance.save()
             return redirect('profile', username=username)
     else:
-        form_instance = forms.ProfileForm()
+        form_instance = forms.ProfileForm(initial=data)
     context = {
         "form":form_instance,
         "title": title,
@@ -670,11 +706,14 @@ def pledgeSupport(request,  username=None):
 
 
             causes = agency.causes.all()
-
-
+            if request.user in agency.admin_users.all():
+                is_admin = True
+            else:
+                is_admin = False
             context = {
                 "username": username,
                 "is_agency": True,
+                "is_admin": is_admin,
                 "user": request.user,
                 "agency": agency,
                 "is_user": checkAuth(request),
@@ -722,38 +761,47 @@ def addAgency(request, username=None):
 
 
 def activeCauses(request):
-    reader = geoip2.database.Reader('../GeoLite2-City_20201013/GeoLite2-City.mmdb')
-    ip = '24.94.15.83'
-    response = reader.city(ip)
-    print(response.city.geoname_id)
-
-    location1 = (response.location.latitude, response.location.longitude)
-
-    geolocator = Nominatim(user_agent="my_user_agent")
-    loc = geolocator.geocode("Chico, CA", exactly_one=False)[0]
-
-    location2 = (loc.latitude, loc.longitude)
-
-
-    distance = geopy.distance.distance(location1, location2).miles
-    print(distance)
-    reader.close()
+    # reader = geoip2.database.Reader('../GeoLite2-City_20201013/GeoLite2-City.mmdb')
+    # ip = '24.94.15.83'
+    # response = reader.city(ip)
+    # print(response.city.geoname_id)
+    #
+    # location1 = (response.location.latitude, response.location.longitude)
+    #
+    # geolocator = Nominatim(user_agent="my_user_agent")
+    # loc = geolocator.geocode("Chico, CA", exactly_one=False)[0]
+    #
+    # location2 = (loc.latitude, loc.longitude)
+    #
+    #
+    # distance = geopy.distance.distance(location1, location2).miles
+    # print(distance)
+    # reader.close()
 
     cause = Cause.objects.all()
+    cause_type = Cause.objects.values_list('type_of_cause', flat=True)
+    #print(cause_type)
     cause_cities = Cause.objects.values_list('location', flat=True)
-    print("here are the cities: ")
-    print(cause_cities)
     cities = City.objects.all().filter(id__in = cause_cities)
     if request.method == 'POST':
         city_id = request.POST.get('city_id')
+        type_id = request.POST.get('type_id')
         if city_id is not "":
-            selected_item = get_object_or_404(City, pk=request.POST.get('city_id'))
-            cause = Cause.objects.filter(location=selected_item)
+            if type_id is not "":
+                selected_item = get_object_or_404(City, pk=request.POST.get('city_id'))
+                cause = Cause.objects.filter(location=selected_item, type_of_cause=type_id)
+            else:
+                selected_item = get_object_or_404(City, pk=request.POST.get('city_id'))
+                cause = Cause.objects.filter(location=selected_item)
+        elif type_id is not "":
+            cause = Cause.objects.filter(type_of_cause=type_id)
+
 
 
     context = {
         "Cause": cause,
         "cities": cities,
+        "cause_type": cause_type,
         "is_user": checkAuth(request)
     }
     return render(request, 'main/activeCauses.html', context=context)
@@ -923,9 +971,10 @@ def addVolunteerRequest(request, username):
           agency_url = agency.username
           agency_name = agency.name
           cause_url = cause.username
+          date_p = form_instance.cleaned_data['date_needed']
           cause_name = cause.title
           type="agency add volunteer request"
-          Agency_Social_Media_Post.objects.create(author=agency, text=txt, agency_profile=agency_url, agency_name=agency_name, cause_profile=cause_url, cause_name=cause_name, type=type)
+          Agency_Social_Media_Post.objects.create(author=agency, text=txt, agency_profile=agency_url, agency_name=agency_name, cause_profile=cause_url, cause_name=cause_name, type=type, date_posted=date_p)
 
 
           instance.save()
@@ -1150,6 +1199,18 @@ def PledgeToVolunteer(request, id):
     if request.user not in VolunteerPledge.volunteers.all():
         prof = Profile.objects.filter(user=request.user)[0]
         prof.number_of_volunteering_participations+=1
+        agency = VolunteerPledge.agency
+        cause = VolunteerPledge.cause
+        if prof.number_of_agencies_contributed_to:
+            if agency not in prof.number_of_agencies_contributed_to.all():
+                prof.number_of_agencies_contributed_to.add(agency)
+        else:
+            prof.number_of_agencies_contributed_to.add(agency)
+        if prof.number_of_causes_contributed_to:
+            if cause not in prof.number_of_causes_contributed_to.all():
+                prof.number_of_causes_contributed_to.add(cause)
+        else:
+            prof.number_of_causes_contributed_to.add(cause)
         prof.save()
 
         VolunteerPledge.volunteers.add(request.user)
@@ -1309,7 +1370,7 @@ def followingFeed(request):
     user_posts = []
     agency_posts = []
     agencies_followed = Profile.objects.filter(user=request.user).values_list('agencies_following')
-    print(agencies_followed)
+    #print(agencies_followed)
     try:
 
         for u in users:
@@ -1318,7 +1379,7 @@ def followingFeed(request):
             usp = Social_Media_Post.objects.filter(author=prof)
 
             for p in usp:
-                print(p)
+                #print(p)
                 user_posts.append(p)
     except:
         has_user_posts=False
@@ -1326,7 +1387,7 @@ def followingFeed(request):
         for a in agencies_followed:
             asp = Agency_Social_Media_Post.objects.filter(author=a)
             for a in asp:
-                print(a)
+                #print(a)
                 agency_posts.append(a)
     except:
         has_agency_posts=False

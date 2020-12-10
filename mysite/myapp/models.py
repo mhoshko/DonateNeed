@@ -16,7 +16,8 @@ CAUSE_TYPES =(
     ("tornado", "Tornadoes"),
     ("tsunami", "Tsunamies"),
     ("winter_storm", "Winter and Ice Storms"),
-    ("general", "General Organization Need")
+    ("general", "General Organization Need"),
+    ("community", "Community Outreach")
 
 
 )
@@ -41,7 +42,7 @@ class News_Articles(models.Model):
 
 class Agencies(models.Model):
   name = models.CharField(max_length=100)
-  email = models.EmailField(max_length=50)
+  email = models.EmailField(max_length=50, blank=True)
   address = models.CharField(max_length=100)
   url = models.URLField(max_length=200)
   phone = PhoneField()
@@ -51,6 +52,8 @@ class Agencies(models.Model):
   causes = models.ManyToManyField(Cause, blank=True)
   admin_users = models.ManyToManyField(User, blank=True, related_name="agency")
   only_volunteer = models.BooleanField(default=False)
+  monetary_donation_url = models.URLField(max_length=200, blank=True)
+  volunteer_url = models.URLField(max_length=200, blank=True)
   def __str__(self):
       return self.name
 
@@ -96,6 +99,7 @@ class Volunteering(models.Model):
     amount_fulfilled = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     percent_complete = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     volunteers = models.ManyToManyField(User, blank=True, related_name="volunteer")
+    name_of_event = models.CharField(max_length=2000, blank=True, null=True)
 
 SIZES =(
     ("xxxs", "XXXS"),

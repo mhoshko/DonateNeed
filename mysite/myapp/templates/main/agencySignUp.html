@@ -1,48 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}Agency Registration{% endblock %}
+{% block title %}Organization Registration{% endblock %}
 {% block content %}
 <div class="container first-element">
   <br>
   <div class="row justify-content-md-left align-items-start">
     {% if not is_user %}
-      <h4>To register an agency you must be signed in</h4>
+      <h4>To register an organization you must be signed in</h4>
 
       <a class="btn btn-info" href="/login/" role="button">Sign In Here</a>
     {% endif %}
+    </div>
     {% if is_user %}
-        <h3>Agency Registration</h3>
-      </div>
+        <div class="text-center"><h3>Organization Registration</h3></div>
 
       <form action="{% url 'agencySignUp' %}" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{ form.errors }}
 
         <div class="row">
-          <p>Name: {{ form.name }}</p>
+          <p>*Name: {{ form.name }}</p>
         </div>
         <div class="row">
           <p>Email: {{ form.email }}</p>
         </div>
         <div class="row">
-          <p>Address: {{ form.address }}</p>
+          <p>*Address: {{ form.address }}</p>
         </div>
         <div class="row">
-          <p>City: {{ form.city }}</p>
+          <p>*City: {{ form.city }}</p>
         </div>
         <div class="row">
-          <p>URL: {{ form.url }}</p>
+          <p>*URL: {{ form.url }}</p>
         </div>
         <div class="row">
-          <p>Phone: {{ form.phone }}</p>
+          <p>*Phone: {{ form.phone }}</p>
         </div>
         <div class="row">
-          <p>My agency is only accepts volunteers: {{ form.only_volunteer }}</p>
+          <p>My agency is only accepts volunteers and monetary donations: {{ form.only_volunteer }}</p>
+        </div>
+        <div class="row">
+          <p>URL to Organization's Monetary Donation Page: {{ form.monetary_donation_url }}</p>
+        </div>
+        <div class="row">
+          <p>URL to Organization's Volunteering Page: {{ form.volunteer_url }}</p>
         </div>
         <div class="row">
           <p>Picture: {{ form.picture }}</p>
         </div>
-
+        <div class="row">
+          <br>
+          <p>* required </p>
+          </div>
 
 
 

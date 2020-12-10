@@ -13,7 +13,7 @@
          <p>There are no requests with the given filters.</p>
          {% endif %}
          <form method="POST">
-           Filter by Agency
+           Filter by Organization
          {% csrf_token %}
          <select name="agency_id">
             <option value="">None</option>
@@ -40,7 +40,7 @@
                <th>Amount Fulfilled</th>
                <th>Date Requested</th>
                <th>Completed</th>
-               <th>Agency</th>
+               <th>Organization</th>
                <th>Cause</th>
                <th>Progress</th>
                <th></th>
