@@ -5,14 +5,20 @@ body {
 
 html {
   height: 100%;
+  font-family: "Times New Roman", Times, serif;
 }
 
+p {
+  font-family: "Times New Roman", Times, serif;
+}
 
 /*-------------------*/
 /***** JUMBOTRON *****/
 /*-------------------*/
 #slogan {
-  padding-top: 30vh;
+  padding-top: 45vh;
+  padding-left: 10vh;
+  font-family:  cursive;
 }
 
 .jumbotron {
@@ -20,7 +26,7 @@ html {
 }
 
 .jumboImg {
-  background-image: url("/static/media/anotherOne.jpg");
+  background-image: url("/static/media/new.jpg");
   background-size: cover;
 }
 
@@ -151,6 +157,10 @@ html {
   animation: bounce 2s infinite;
 }
 
+.navbar {
+    font-family: "Times New Roman", Times, serif;
+}
+
 /*-----------------------*/
 /*******Night Styles******/
 /*-----------------------*/
@@ -165,6 +175,7 @@ html {
 .first-element
 {
   padding-top: 60px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 /*--------------*/
@@ -178,6 +189,7 @@ html {
     color: #00acc1;
     /* position: absolute; */
     bottom: 0;
+    font-family: "Times New Roman", Times, serif;
 }
 
 ul{
@@ -256,15 +268,19 @@ a:hover
 /*--------------------*/
 .card {
   text-align: center;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .title {
   color: grey;
   font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .profileCard {
-  margin: 20px;
+  margin-top :20px;
+  margin-left: 1px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .profileCardContact {
@@ -278,10 +294,80 @@ a:hover
   cursor: pointer;
   width: 100%;
   font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 
 .lol {
   z-index:3;
   position:relative;
+}
+
+
+.text-center {
+  font-family: "Times New Roman", Times, serif;
+}
+
+.table {
+    font-family: "Times New Roman", Times, serif;
+}
+
+.col-small {
+    font-family: "Times New Roman", Times, serif;
+}
+
+
+
+.navbar-brand {
+  padding: 0;
+}
+.navbar-nav .nav-link {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 50px;
+  line-height: 50px;
+}
+
+
+
+.lol2 {
+    background: rgba(0, 128, 0, 0.3);
+}
+
+
+.btn-info {
+  background-color: #124702;
+  border-color: #124702;
+  outline-color: #124702;
+}
+/* .btn-info {
+    background: #0E390E;
+}
+
+.btn-info:focus{
+  background: #0E390E;
+  border-color: #D5A021 !important;
+}
+*/
+.btn-info:hover {
+    background: #0E390E;
+}
+
+.btn-outline-info  {
+  color: #124702;
+  border-color: #124702;
+  outline-color: #124702;
+}
+
+.btn-outline-info:hover {
+  background: #ffd500;
+  border-color: #ffd500;
+  outline-color: #ffd500;
+  color: #124702;
+
+}
+
+.bg-info {
+  color: #0E390E;
+  background-color: #0E390E;
 }

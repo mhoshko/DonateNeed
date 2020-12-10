@@ -24,16 +24,16 @@
         <div class="text-center"><h4>Agency Updates</h4></div>
         {% for post in agency_posts %}
           {% if post.type == "agency pledge" %}
-          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> pledged their support for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> pledged their support for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
 
           {% elif post.type == "agency add request" %}
-          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedDonations' post.author.username %}">donations</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedDonations' post.author.username %}">donations</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
           {% elif post.type == "agency add volunteer request" %}
-          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedVolunteers' post.author.username %}">volunteers</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedVolunteers' post.author.username %}">volunteers</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
           {% elif post.type == "agency complete donation" %}
-          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> successfully fulfilled one of their donation requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> successfully fulfilled one of their donation requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
           {% elif post.type == "agency complete volunteer" %}
-          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> successfully fulfilled one of their volunteer requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+          <p><a href="/agencyProfile/{{post.author.username}}"><img src="{{post.author.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> successfully fulfilled one of their volunteer requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
 
           {% endif %}
         {% endfor %}

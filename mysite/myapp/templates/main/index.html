@@ -8,7 +8,7 @@
 <div id="top" class="jumbotron jumbotron-fluid jumboImg">
   <div class="container slide-bottom" id="slogan">
 
-      <h1 class="display-3 text-center ml3" style="color:white">Changing the World, one Donation at a Time</h1>
+      <h1 class="display-4 text-center" style="color:white;">Changing the World, one Donation at a Time</h1>
   </div>
 
   <a href="#profile" class="scroll-down">
@@ -50,20 +50,20 @@
     <br>
   </div>
   <div class="col-sm-12">
-    <h2><div class="text-center">Agencies Near You</div></h2>
+    <h2><div class="text-center">Agencies Registered with DonateNeed</div></h2>
     <div class="card-columns p-2">
 
       {% for agency in agencies %}
         <div class="card">
-          <img class="card-img-top p-2 night" src="{{ agency.picture.url }}" onerror="this.style.display='none'">
+          <img class="card-img-top night" src="{{ agency.picture.url }}" onerror="this.style.display='none'">
           <div class="text">
             <h5>{{ agency.name }}</h5>
             <p>{{ agency.address }}</p>
             <p>{{ agency.phone }}</p>
-            <div class="text-center">
-              <a href="{{ agency.url }}" class="btn mb-2 btn-outline-info">Visit Website</a>
-            </div>
             <a href ="/agencyProfile/{{ agency.username }}" class="stretched-link"></a>
+            <div class="text-center">
+              <a href="{{ agency.url }}" class="btn mb-2 btn-outline-info lol">Visit Website</a>
+            </div>
           </div>
         </div>
       {% endfor %}

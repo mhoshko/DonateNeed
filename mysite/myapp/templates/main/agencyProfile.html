@@ -17,28 +17,26 @@
       <p class="title">{{ agency.address }}</p>
       <p class="title">{{ agency.phone }}</p>
       <p><a href="{{ agency.url}}" class="profileCardContact">Visit Agency Website</a></p>
+      {% if not is_follower %}
+      <form method='get' action=''>
+        <button type="submit" value="Follow" name="follow" class="profileCardContact">Follow</button>
+        </form>
+      {% else %}
+      <form method='get' action=''>
+        <button type="submit" value="Unfollow" name="follow" class="profileCardContact">Unfollow </button>
+        </form>
+      {% endif %}
    </div>
 
-   <div class="col-5">
-     {% if not is_follower %}
-     <form method='get' action=''>
-       <button type="submit" value="Follow" name="follow" class="btn mb-2 btn-outline-info">Follow</button>
-       </form>
-     {% else %}
-     <form method='get' action=''>
-       <button type="submit" value="Unfollow" name="follow" class="btn mb-2 btn-outline-info">Unfollow </button>
-       </form>
-     {% endif %}
-
-     
+   <div class="col-sm">
      {% if requests %}
       <div class="container-fluid">
          <div align="center">
             <div class="ct-chart" id="chart1"></div>
-            <a href="#requests">Jump to Donation Requests</a>
+            <a href="#requests">Donation Request Progress</a>
             <script>
                new Chartist.Pie('#chart1',
-               { labels: ['Completed', 'In progress'], series: [{{requests_completed}}, {{requests_in_progress}}] },
+               { labels: ['Completed ({{amount_fulfilled_total}}%)', 'In progress ({{amount_not_fulfilled}}%)'], series: [{{amount_fulfilled_total}}, {{amount_not_fulfilled}}] },
                { labelInterpolationFnc: function(value) { return value[0] } },
                [['screen', { chartPadding: 20, labelOffset: 60, labelDirection: 'explode',
                labelInterpolationFnc: function(value) { return value;}}]]);
@@ -49,23 +47,29 @@
       {% endif %}
       <br>
       {% if agency.causes.all %}
+            <br>
+            <br>
+      <div class="text-center">
       <h3>Causes we support:</h3>
       {% for cause in agency.causes.all %}
       <a href="/cause/{{ cause.username }}" class ="btn mb-2 btn-outline-info">{{cause.title}}</a>
       {% endfor %}
       {% endif %}
+      </div>
+
       {% endif %}
    </div>
    </div>
 
 
 {% if not volunteer_only %}
-<div class="container-fluid profileCard">
+<div class="container">
   {% if not requests %}
   <p>{{agency}} currently has no requests for donations</p>
-  </div>
   {% else %}
-
+    <br>
+    <br>
+      <div class="text-center"><h4>Donation Requests</h4></div>
      <div id = requests>
         <div class = "custom-control" "custom_checkbox">
            <form method="POST">
@@ -126,10 +130,13 @@
 </div>
 
 
-<div class="container-fluid profileCard">
+<div class="container">
  {% if not volunteering_request %}
  <p>{{agency}} currently has no requests for volunteers</p>
  {% else %}
+ <br>
+ <br>
+ <div class="text-center"><h4>Volunteer Requests</h4></div>
  <table class = "table table-bordered table-hover">
     <tr>
       <th>Number of Requested Volunteers</th>
@@ -169,47 +176,54 @@
   </table>
 
 
+
  <a href = "{% url 'agencyRequestedVolunteers' username %}" class="btn mb-2 btn-outline-info">View all of {{agency}}'s Requests for Volunteers</a>
+{% endif %}
+
+ {% if is_admin %}
+ <a href = "{% url 'addVolunteerRequest' username %}" class="btn mb-2 btn-outline-info">Add Volunteer Request</a>
+
+
+ <!-- <div class="container-fluid justify-content-center"> -->
+  <br>
+  <br>
+    <div class="card col-5 mx-auto">
+
+    <h2>Administration</h2>
+    <a href="/addAgency/{{username}}" class ="btn mb-2 btn-outline-info">Add other admin users to this agency</a>
+    <a href="/pledgeSupport/{{username}}" class ="btn mb-2 btn-outline-info">Add supported causes to this agency</a>
+
+    </div>
+  {% endif %}
+
 
  {% if has_posts %}
-
+    <br>
+    <br>
+    <h4>&emsp;&emsp;{{agency.name}} Updates</h4>
    {% for post in posts %}
      {% if post.type == "agency pledge" %}
-     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> pledged their support for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> pledged their support for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
 
      {% elif post.type == "agency add request" %}
-     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedDonations' username %}">donations</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedDonations' username %}">donations</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
      {% elif post.type == "agency add volunteer request" %}
-     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedVolunteers' username %}">volunteers</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> made a request for <a href = "{% url 'agencyRequestedVolunteers' username %}">volunteers</a> to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
      {% elif post.type == "agency complete donation" %}
-     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> successfully fulfilled one of their donation requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> successfully fulfilled one of their donation requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
      {% elif post.type == "agency complete volunteer" %}
-     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> successfully fulfilled one of their volunteer requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
+     <p><a href="/agencyProfile/{{agency.username}}"><img src="{{agency.picture.url }}", class="avatar"></a> <a href="/agencyProfile/{{ post.agency_profile }}">  {{ post.agency_name }}</a> successfully fulfilled one of their volunteer requests to support <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> on {{post.date_posted}}</p>
 
      {% endif %}
    {% endfor %}
 
  {% endif %}
 
-{% endif %}
+
 
 </div>
 
 
-
-
-
-
-
-{% if is_admin %}
-<!-- <div class="container-fluid justify-content-center"> -->
-   <div class="card col-5 mx-auto">
-   <h2>Administration</h2>
-   <a href="/addAgency/{{username}}" class ="btn mb-2 btn-outline-info">Add other admin users to this agency</a>
-   <a href="/pledgeSupport/{{username}}" class ="btn mb-2 btn-outline-info">Add supported causes to this agency</a>
-   {% endif %}
-</div>
-</div>
 <div id="deleteModal" class="modal fade" role='dialog'>
    <div class="modal-dialog">
       <div class="modal-content">

@@ -16,7 +16,8 @@ CAUSE_TYPES =(
     ("tornado", "Tornadoes"),
     ("tsunami", "Tsunamies"),
     ("winter_storm", "Winter and Ice Storms"),
-    ("general", "General Organization Request")
+    ("general", "General Organization Need")
+
 
 )
 
@@ -65,6 +66,9 @@ class Profile(models.Model):
   followers = models.ManyToManyField("self", blank=True)
   following = models.ManyToManyField("self", blank=True)
   agencies_following = models.ManyToManyField(Agencies, blank=True, related_name="user_followers")
+  number_of_items_donated = models.DecimalField(max_digits=1000000000000, decimal_places=0, default=0)
+  number_of_causes_contributed_to = models.ManyToManyField(Cause, blank=True)
+  number_of_agencies_contributed_to = models.ManyToManyField(Agencies, blank=True)
   def __str__(self):
     return self.user.username
 
@@ -84,7 +88,7 @@ post_save.connect(create_user_profile, sender=User)
 
 class Volunteering(models.Model):
     number_of_volunteers = models.DecimalField(max_digits=10, decimal_places=0)
-    date_needed = models.DateField(auto_now=False, auto_now_add=True)
+    date_needed = models.DateField(auto_now=False)
     location = models.ForeignKey(City, on_delete=models.PROTECT, blank=True, null=True)
     agency = models.ForeignKey(Agencies, on_delete=models.SET_NULL, blank=True, null=True)
     cause = models.ForeignKey(Cause, on_delete=models.SET_NULL, blank=True, null=True, related_name='cs2')
@@ -117,7 +121,7 @@ class Request_In_Progress(models.Model):
   date_requested = models.DateField(auto_now=False, auto_now_add=True)
   agency = models.ForeignKey(Agencies, on_delete=models.SET_NULL, blank=True, null=True)
   cause = models.ForeignKey(Cause, on_delete=models.SET_NULL, blank=True, null=True, related_name='cs')
-  percent_complete = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+  percent_complete = models.DecimalField(max_digits=1000, decimal_places=2, default=0)
 
 
 
@@ -141,6 +145,8 @@ class Social_Media_Post(models.Model):
     type = models.CharField(max_length=20, default=None)
     cause_profile = models.CharField(max_length=10000, null=True)
     cause_name = models.CharField(max_length=10000, null=True)
+    number_pledged = models.DecimalField(max_digits=100000, decimal_places=0, default=0)
+    item = models.CharField(max_length=10000, null=True)
 
 
 class Agency_Social_Media_Post(models.Model):

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
 {% block content %}
 <!-- <form class="form-inline first-element">
    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -14,22 +14,22 @@
   <br>
   <div class="container">
      <div class = "col-small">
-    <form method="POST">
-     Filter by City
-    {% csrf_token %}
-    <select name="city_id">
-    	<option value="">None</option>
-    	{% for city in cities %}
-    	<option value="{{ city.id }}">{{ city }}</option>
-    	{% endfor %}
-
-    	<input type="submit" value="Filter" />
-        </select>
-    </form>
+        <form method="POST">
+         Filter by City
+        {% csrf_token %}
+        <select name="city_id">
+        	<option value="">None</option>
+        	{% for city in cities %}
+        	<option value="{{ city.id }}">{{ city }}</option>
+        	{% endfor %}
+        	<input type="submit" value="Filter" />
+            </select>
+        </form>
+      </div>
     <div class="card-columns p-2">
       {% for agency in agencies %}
       <div class="card">
-        <img class="card-img-top p-2 night" src="{{ agency.picture.url }}" onerror="this.style.display='none'">
+        <img class="card-img-top night" src="{{ agency.picture.url }}" onerror="this.style.display='none'">
         <div class="text">
           <h5>{{ agency.name }}</h5>
           <p>{{ agency.address }}</p>
@@ -45,7 +45,9 @@
       </div>
       {% endfor %}
     </div>
+    <div class="text-center">
     <a href="{% url 'agencySignUp' %}" class="btn mb-2 btn-outline-info">Is your agency not listed? Sign up your agency here</a>
+    </div>
   </div>
 </div>
 </div>

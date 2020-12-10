@@ -116,39 +116,39 @@ def home(request):
     articles = models.News_Articles.objects.all().order_by('-picture')
     articles = articles[:4]
     Agenciess = models.Agencies.objects.all()[:6]
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    #try:
-
-    reader = geoip2.database.Reader('../GeoLite2-City_20201013/GeoLite2-City.mmdb')
-    ip = '24.94.15.83'
-    response = reader.city(ip)
-
-    # print(response.country.iso_code)
-    # print(response.country.name)
-    # print(response.country.names['zh-CN'])
-    # print(response.subdivisions.most_specific.name)
-    # print(response.subdivisions.most_specific.iso_code)
-    # print(response.city.name)
-    # print(response.postal.code)
-    # print(response.location.latitude)
-    # print(response.location.longitude)
-    location1 = (response.location.latitude, response.location.longitude)
-
-    geolocator = Nominatim(user_agent="my_user_agent")
-    loc = geolocator.geocode("Cleveland, OH", exactly_one=False)[0]
-
-    location2 = (loc.latitude, loc.longitude)
-
-    print(City.objects.filter(latitude=46.97537))
-
-    distance = geopy.distance.distance(location1, location2).miles
-    print(distance)
-    reader.close()
+    # x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    #
+    # if x_forwarded_for:
+    #     ip = x_forwarded_for.split(',')[0]
+    # else:
+    #     ip = request.META.get('REMOTE_ADDR')
+    # #try:
+    #
+    # reader = geoip2.database.Reader('../GeoLite2-City_20201013/GeoLite2-City.mmdb')
+    # ip = '24.94.15.83'
+    # response = reader.city(ip)
+    #
+    # # print(response.country.iso_code)
+    # # print(response.country.name)
+    # # print(response.country.names['zh-CN'])
+    # # print(response.subdivisions.most_specific.name)
+    # # print(response.subdivisions.most_specific.iso_code)
+    # # print(response.city.name)
+    # # print(response.postal.code)
+    # # print(response.location.latitude)
+    # # print(response.location.longitude)
+    # location1 = (response.location.latitude, response.location.longitude)
+    #
+    # geolocator = Nominatim(user_agent="my_user_agent")
+    # loc = geolocator.geocode("Cleveland, OH", exactly_one=False)[0]
+    #
+    # location2 = (loc.latitude, loc.longitude)
+    #
+    # print(City.objects.filter(latitude=46.97537))
+    #
+    # distance = geopy.distance.distance(location1, location2).miles
+    # print(distance)
+    # reader.close()
     # except:
     #     pass
 
@@ -180,8 +180,6 @@ def agencies(request):
     title = "Agencies "
     Agenciess = models.Agencies.objects.all()
     agency_cities = Agencies.objects.values_list('city', flat=True)
-    print("here are the cities: ")
-    print(agency_cities)
     cities = City.objects.all().filter(id__in = agency_cities)
 
     if request.method == 'POST':
@@ -314,8 +312,6 @@ def signUp(request):
 
 
 def agencyProfile(request, uname=None):
-
-
     delete = request.GET.get('delete', 0)
 
     if delete != 0:
@@ -327,10 +323,8 @@ def agencyProfile(request, uname=None):
     agency = Agencies.objects.get(username=uname)
     try:
         posts = Agency_Social_Media_Post.objects.filter(author=agency).order_by('-date_posted')
-        print(posts)
         if posts:
             has_posts = True
-            print("here")
         else:
             has_posts=False
     except:
@@ -338,9 +332,20 @@ def agencyProfile(request, uname=None):
 
     try:
         agency = Agencies.objects.get(username=uname)
+        proportion = Request_In_Progress.objects.filter(agency=agency).values_list('amount_fulfilled', 'amount_total')
+        amount_fulfilled_total = 0
+        amount_requested_total = 0
+        amount_not_fulfilled = 0
+        for p in proportion:
+            amount_fulfilled_total += p[0]
+            amount_requested_total += p[1]
+
+        if amount_requested_total:
+            amount_not_fulfilled = round((amount_requested_total-amount_fulfilled_total)*100/amount_requested_total, 2)
+            amount_fulfilled_total = round(amount_fulfilled_total*100/amount_requested_total, 2)
         requests_in_progress = Request_In_Progress.objects.filter(is_complete=True, agency=agency).count()
         requests_completed = Request_In_Progress.objects.filter(is_complete=False, agency=agency).count()
-        volunteering_request = Volunteering.objects.filter(agency=agency)
+        volunteering_request = Volunteering.objects.filter(agency=agency)[:6]
         if request.user not in agency.admin_users.all():
             is_admin = False
         else:
@@ -360,9 +365,9 @@ def agencyProfile(request, uname=None):
         hidden_checked = is_hidden['requests_view_hide_completed'].value()
 
         if hidden_checked:
-            requests = Request_In_Progress.objects.filter(is_complete=False, agency=agency)
+            requests = Request_In_Progress.objects.filter(is_complete=False, agency=agency)[:6]
         else:
-            requests = Request_In_Progress.objects.filter(agency=agency)
+            requests = Request_In_Progress.objects.filter(agency=agency)[:6]
 
         instance  = models.Profile.objects.get(user=request.user)
         causes = agency.causes
@@ -395,6 +400,8 @@ def agencyProfile(request, uname=None):
         context = {
             "title": title,
             "is_follower": is_follower,
+            "amount_fulfilled_total": amount_fulfilled_total,
+            "amount_not_fulfilled": amount_not_fulfilled,
             "volunteer_only": volunteer_only,
             "is_user": checkAuth(request),
             "user": request.user,
@@ -473,6 +480,7 @@ def profile(request, username=None):
         return HttpResponseRedirect("/")
 
 
+
     is_follower = False
     has_posts = False
     posts = []
@@ -486,8 +494,11 @@ def profile(request, username=None):
             is_personal_profile = True
             user = request.user
             profile = Profile.objects.get(user=request.user)
-            print(profile.number_of_donations)
-            print(profile.number_of_volunteering_participations)
+            number_of_donations = profile.number_of_donations
+            number_of_volunteering_participations = profile.number_of_volunteering_participations
+            number_of_items_donated = profile.number_of_items_donated
+            number_of_causes_contributed_to = profile.number_of_causes_contributed_to.count()
+            number_of_agencies_contributed_to = profile.number_of_agencies_contributed_to.count()
             all_agencies = Agencies.objects.all()
             for agency in all_agencies:
                 if request.user in agency.admin_users.all():
@@ -511,6 +522,12 @@ def profile(request, username=None):
            profile = Profile.objects.get(user=user_info)
            prof = Profile.objects.get(user=request.user)
 
+           number_of_donations = profile.number_of_donations
+           number_of_volunteering_participations = profile.number_of_volunteering_participations
+           number_of_items_donated = profile.number_of_items_donated
+           number_of_causes_contributed_to = profile.number_of_causes_contributed_to.count()
+           number_of_agencies_contributed_to = profile.number_of_agencies_contributed_to.count()
+
            delete = request.GET.get('follow', 0)
            if delete != 0:
                 if(prof in profile.followers.all()):
@@ -522,8 +539,6 @@ def profile(request, username=None):
            if(prof in profile.followers.all()):
                is_follower = True
 
-           print(profile.number_of_donations)
-           print(profile.number_of_volunteering_participations)
            all_agencies = Agencies.objects.all()
            for agency in all_agencies:
                if user_info in agency.admin_users.all():
@@ -535,11 +550,12 @@ def profile(request, username=None):
                    has_event = True
                    user_events.append(v)
            try:
-               posts = Social_Media_Post.objects.filter(author=user_info).order_by('-date_posted')
+               posts = Social_Media_Post.objects.filter(author=user_info).order_by('-date_posted')[:15]
                if posts:
                    has_posts = True
            except:
                has_posts = False
+
 
         is_an_account = True
         context = {
@@ -557,6 +573,11 @@ def profile(request, username=None):
             "user_info": user_info,
             "has_agency": has_agency,
             "is_personal_profile": is_personal_profile,
+            "number_of_donations": number_of_donations,
+            "number_of_volunteering_participations": number_of_volunteering_participations,
+            "number_of_items_donated": number_of_items_donated,
+            "number_of_causes_contributed_to": number_of_causes_contributed_to,
+            "number_of_agencies_contributed_to": number_of_agencies_contributed_to
         }
         return render(request, 'main/profile.html', context=context)
     except models.User.DoesNotExist:
@@ -746,22 +767,25 @@ def causePage(request, uname=None):
     try:
         cause_info = Cause.objects.get(username=username)
         requests = Request_In_Progress.objects.filter(cause=cause_info.id)
+        volunteer_requests = Volunteering.objects.filter(cause=cause_info.id)
         article1 = News_Articles.objects.filter(description__contains=uname)
         article2  = News_Articles.objects.filter(title__contains=uname)
         agencies = Agencies.objects.filter(causes=cause_info)
+
         #if request.user not in agency.admin_users.all():
         if request.method == 'POST':
             agency_id = request.POST.get('agency_id')
             if agency_id is not "":
                 selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
                 requests = Request_In_Progress.objects.filter(agency=selected_item, cause=cause_info.id)
-
+                volunteer_requests = Volunteering.objects.filter(agency=selected_item, cause=cause_info.id)
         articles = article1 | article2
         is_cause = True
         context = {
             "title": title,
             "is_user": checkAuth(request),
             "user": request.user,
+            "volunteer_requests": volunteer_requests,
             "uname": uname,
             "agencies": agencies,
             "is_cause": is_cause,
@@ -931,7 +955,7 @@ def activeDonations(request):
 
     agencies = Agencies.objects.all()
     causes = Cause.objects.all()
-    requests = Request_In_Progress.objects.filter(is_complete=False)
+    requests = Request_In_Progress.objects.filter(is_complete=False).order_by('-date_requested')
 
 
     if request.method == 'POST':
@@ -941,14 +965,14 @@ def activeDonations(request):
             if cause_id is not "":
                 selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
                 selected_cause = get_object_or_404(Cause, pk=request.POST.get('cause_id'))
-                requests = Request_In_Progress.objects.filter(agency=selected_item, cause=selected_cause, is_complete=False)
+                requests = Request_In_Progress.objects.filter(agency=selected_item, cause=selected_cause, is_complete=False).order_by('-date_requested')
             else:
                 selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
-                requests = Request_In_Progress.objects.filter(agency=selected_item, is_complete=False)
+                requests = Request_In_Progress.objects.filter(agency=selected_item, is_complete=False).order_by('-date_requested')
 
         elif cause_id is not "":
             selected_cause = get_object_or_404(Cause, pk=request.POST.get('cause_id'))
-            requests = Request_In_Progress.objects.filter(cause=selected_cause, is_complete=False)
+            requests = Request_In_Progress.objects.filter(cause=selected_cause, is_complete=False).order_by('-date_requested')
 
 
 
@@ -973,7 +997,7 @@ def activeVolunteerRequests(request):
 
     agencies = Agencies.objects.all()
     causes = Cause.objects.all()
-    requests = Volunteering.objects.all()
+    requests = Volunteering.objects.all().order_by('-date_needed')
 
 
     request_cities = Volunteering.objects.values_list('location', flat=True)
@@ -989,29 +1013,30 @@ def activeVolunteerRequests(request):
                     selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
                     selected_cause = get_object_or_404(Cause, pk=request.POST.get('cause_id'))
                     selected_location = get_object_or_404(City, pk=request.POST.get('city_id'))
-                    requests = Volunteering.objects.filter(agency=selected_item, cause=selected_cause, location=selected_location)
+                    requests = Volunteering.objects.filter(agency=selected_item, cause=selected_cause, location=selected_location).order_by('-date_needed')
                 else:
                     selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
                     selected_cause = get_object_or_404(Cause, pk=request.POST.get('cause_id'))
-                    requests = Volunteering.objects.filter(agency=selected_item, cause=selected_cause)
+                    requests = Volunteering.objects.filter(agency=selected_item, cause=selected_cause).order_by('-date_needed')
             elif city_id is not "":
                 selected_location = get_object_or_404(City, pk=request.POST.get('city_id'))
                 selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
-                requests = Volunteering.objects.filter(agency=selected_item, location=selected_location)
+                requests = Volunteering.objects.filter(agency=selected_item, location=selected_location).order_by('-date_needed')
             else:
                 selected_item = get_object_or_404(Agencies, pk=request.POST.get('agency_id'))
-                requests = Volunteering.objects.filter(agency=selected_item)
+                requests = Volunteering.objects.filter(agency=selected_item).order_by('-date_needed')
         elif cause_id is not "":
             if city_id is not "":
                 selected_cause = get_object_or_404(Cause, pk=request.POST.get('cause_id'))
                 selected_location = get_object_or_404(City, pk=request.POST.get('city_id'))
-                requests = Volunteering.objects.filter(cause=selected_cause, location=selected_location)
+                requests = Volunteering.objects.filter(cause=selected_cause, location=selected_location).order_by('-date_needed')
             else:
                 selected_cause = get_object_or_404(Cause, pk=request.POST.get('cause_id'))
-                requests = Volunteering.objects.filter(cause=selected_cause)
+                requests = Volunteering.objects.filter(cause=selected_cause).order_by('-date_needed')
         elif city_id is not "":
                 selected_location = get_object_or_404(City, pk=request.POST.get('city_id'))
-                requests = Volunteering.objects.filter(location=selected_location)
+                requests = Volunteering.objects.filter(location=selected_location).order_by('-date_needed')
+
 
     user = request.user
     context = {
@@ -1038,13 +1063,6 @@ def finalSubmitDonation(request, id):
         form_instance = forms.MakeDonation(request.POST)
         if form_instance.is_valid():
 
-          prof = Profile.objects.filter(user=request.user)[0]
-          prof.number_of_donations+=1
-          prof.save()
-
-
-
-
           instance = form_instance.save(commit=False)
           instance.user = request.user
           instance.request_in_progress = donation
@@ -1054,6 +1072,27 @@ def finalSubmitDonation(request, id):
           pledged = form_instance.cleaned_data['promised_amount']
           fulfilled = donation.amount_fulfilled
           total = donation.amount_total
+
+
+
+          prof = Profile.objects.filter(user=request.user)[0]
+          prof.number_of_donations+=1
+          prof.number_of_items_donated += pledged
+          agency = donation.agency
+          cause = donation.cause
+          if prof.number_of_agencies_contributed_to:
+              if agency not in prof.number_of_agencies_contributed_to.all():
+                  prof.number_of_agencies_contributed_to.add(agency)
+          else:
+              prof.number_of_agencies_contributed_to.add(agency)
+          if prof.number_of_causes_contributed_to:
+               if cause not in prof.number_of_causes_contributed_to.all():
+                   prof.number_of_causes_contributed_to.add(cause)
+          else:
+              prof.number_of_causes_contributed_to.add(cause)
+
+
+          prof.save()
 
           donation.amount_fulfilled = pledged+fulfilled
           donation.percent_complete = ((pledged+fulfilled)/total)*100
@@ -1065,9 +1104,11 @@ def finalSubmitDonation(request, id):
           agency_name=donation.agency.name
           cause_url = donation.cause.username
           cause_name = donation.cause.title
+          number_pledged = pledged
+          item = donation.item
           date_p = datetime.now()
           type="donation"
-          Social_Media_Post.objects.create(author=request.user, text=txt, agency_profile=agency_url, agency_name=agency_name, date_posted=date_p, cause_profile=cause_url, cause_name=cause_name, type=type)
+          Social_Media_Post.objects.create(author=request.user, text=txt, agency_profile=agency_url, agency_name=agency_name, date_posted=date_p, cause_profile=cause_url, cause_name=cause_name, type=type, number_pledged=number_pledged, item=item)
 
 
           if(donation.amount_fulfilled == donation.amount_total):
@@ -1081,16 +1122,9 @@ def finalSubmitDonation(request, id):
               Agency_Social_Media_Post.objects.create(author=donation.agency, text=txt, agency_profile=agency_url, agency_name=agency_name, cause_profile=cause_url, cause_name=cause_name, type=type)
 
 
-
           donation.save()
-          context = {
-            "user": request.user,
-            "id": id,
-            "is_user": checkAuth(request),
-            "form": form_instance,
-            "donation": donation
-          }
-          return render(request, 'main/activeDonations.html', context=context)
+          return redirect('activeDonations')
+          #return render(request, 'main/activeDonations.html', context=context)
     else:
         form_instance = forms.MakeDonation()
 
@@ -1119,8 +1153,11 @@ def PledgeToVolunteer(request, id):
         prof.save()
 
         VolunteerPledge.volunteers.add(request.user)
+        num_total = VolunteerPledge.number_of_volunteers
         VolunteerPledge.amount_fulfilled += 1;
-        VolunteerPledge.percent_complete += (1/VolunteerPledge.number_of_volunteers)
+        amnt_fulfilled = VolunteerPledge.amount_fulfilled
+        VolunteerPledge.percent_complete = (amnt_fulfilled/num_total)*100
+
 
         txt = user.first_name + user.last_name + "pledged to attend "+ VolunteerPledge.agency.name + "'s volunteering event for " + VolunteerPledge.cause.title + " on"
         agency_url=VolunteerPledge.agency.username
@@ -1273,21 +1310,26 @@ def followingFeed(request):
     agency_posts = []
     agencies_followed = Profile.objects.filter(user=request.user).values_list('agencies_following')
     print(agencies_followed)
-    for u in users:
-        print(Profile.objects.filter(id=u[0]))
-        prof = User.objects.filter(profile=u[0])[0]
-        #us = User.objects.filter(username=prof.user.username)
-        usp = Social_Media_Post.objects.filter(author=prof)
+    try:
 
-        for p in usp:
-            print(p)
-            user_posts.append(p)
+        for u in users:
+            prof = User.objects.filter(profile=u[0])[0]
+            #us = User.objects.filter(username=prof.user.username)
+            usp = Social_Media_Post.objects.filter(author=prof)
 
-    for a in agencies_followed:
-        asp = Agency_Social_Media_Post.objects.filter(author=a)
-        for a in asp:
-            print(a)
-            agency_posts.append(a)
+            for p in usp:
+                print(p)
+                user_posts.append(p)
+    except:
+        has_user_posts=False
+    try:
+        for a in agencies_followed:
+            asp = Agency_Social_Media_Post.objects.filter(author=a)
+            for a in asp:
+                print(a)
+                agency_posts.append(a)
+    except:
+        has_agency_posts=False
 
 
     if user_posts:

@@ -6,11 +6,8 @@
 <br>
 <br>
 <div class="container first-element">
-    <div class="row bg-info">
-        <div class="col-4">
-            <p>
-                {{agency}}'s Volunteer Requests
-            </p>
+        <div class="col-8">
+            <h3><a href="/agencyProfile/{{agency.username}}">{{agency}}'s</a> Volunteer Requests</h3>
         </div>
     </div>
     <!-- {% for request in requests %}
@@ -28,9 +25,7 @@
         <th>Date</th>
         <th>Location</th>
         <th>Cause</th>
-        {% if not is_admin %}
-          <th></th>
-        {% endif %}
+        <th></th>
 
       </tr>
       {% for request in requests %}

@@ -19,45 +19,100 @@
       {% for agency in user_agency %}
         <p class="title">{{ agency }}</p>
       {% endfor %}
-      <p><a href="{{ user_info.email }}" class="profileCardContact">Contact</a></p>
+      <p><a href="mailto: {{ user_info.email }}" class="profileCardContact">Contact</a></p>
+      {% if not is_personal_profile %}
+        {% if not is_follower %}
+        <form method='get' action=''>
+          <button type="submit" value="Follow" name="follow" class="profileCardContact">Follow</button>
+          </form>
+        {% else %}
+        <form method='get' action=''>
+          <button type="submit" value="Unfollow" name="follow" class="profileCardContact">Unfollow </button>
+          </form>
+        {% endif %}
+      {% endif %}
     </div>
+
+
   <!-- </div> -->
   <!-- </div> -->
 <br>
 <!-- <div class="row justify-content-md-center align-items-start"> -->
+<br>
+  <div class="col-sm-8">
+    <div class="row">
+    <div class="card text-white mb-3" style="max-width: 10rem; margin-right: 3px; margin-left: 5px; background-color: #0E390E">
+      <div class="card-body">
+        <h3 class="card-title">{{number_of_donations}}</h3>
+        <p class="card-text">Number Of Donations Made</p>
+      </div>
+    </div>
 
-  <div class="col-5">
+    <div class="card text-white mb-3" style="max-width: 10rem; margin-right: 3px; margin-left: 3px; background-color: #0E390E">
+      <div class="card-body">
+        <h3 class="card-title">{{number_of_volunteering_participations}}</h3>
+        <p class="card-text">Number Of Volunteering Events Attended</p>
+      </div>
+    </div>
+
+    <div class="card text-white mb-3" style="max-width: 10rem; margin-right: 3px; margin-left: 3px; background-color: #0E390E">
+      <div class="card-body">
+        <h3 class="card-title">{{number_of_items_donated}} </h3>
+        <p class="card-text">Number Of Items Donated</p>
+      </div>
+    </div>
+
+    <div class="card text-white mb-3" style="max-width: 10rem; margin-right: 3px; margin-left: 3px; background-color: #0E390E">
+    <div class="card-body">
+      <h3 class="card-title"> {{number_of_causes_contributed_to}}</h3>
+      <p class="card-text">Number Of Causes Contributed To</p>
+    </div>
+    </div>
+    <div class="card text-white mb-3" style="max-width: 10rem; margin-right: 5px; margin-left: 3px; background-color: #0E390E">
+    <div class="card-body">
+      <h3 class="card-title"> {{number_of_agencies_contributed_to}}</h3>
+      <p class="card-text">Number Of Agencies Contributed To</p>
+    </div>
+    </div>
+</div>
+  <div class="col-sm">
     <br>
     {% if not is_personal_profile %}
-      {% if not is_follower %}
-      <form method='get' action=''>
-        <button type="submit" value="Follow" name="follow" class="btn mb-2 btn-outline-info">Follow</button>
-        </form>
-      {% else %}
-      <form method='get' action=''>
-        <button type="submit" value="Unfollow" name="follow" class="btn mb-2 btn-outline-info">Unfollow </button>
-        </form>
-      {% endif %}
-
-
       {% if has_agency %}
-        <h3>View Their Agency Page:</h3>
+        <div class="text-center">
+          <h3>View Their Agency Page:</h3>
         {% for agency in user_agency %}
           <a href="/agencyProfile/{{ agency.username }}" class="btn mb-2 btn-outline-info">{{ agency }}</a>
         {% endfor %}
+        </div>
       {% endif %}
     {% elif is_personal_profile %} <!-- end of not personal profile, beginning of if true-->
     {% if has_agency %}
+      <div class="text-center">
       <h3>View Your Agency Page(s):</h3>
       {% for agency in user_agency %}
       <a href="/agencyProfile/{{ agency.username }}" class="btn mb-2 btn-outline-info">{{ agency }}</a>
       {% endfor %}
+      </div>
     {% elif not has_agency %} <!-- end of agency, now no agency  -->
-      <h3>Don't have an agency? Create yours here:</h3>
+      <div class="text-center">
+      <h3>Is your agency not on DonateNeed? Register it here:</h3>
       <a href="{% url 'agencySignUp' %}" class="btn mb-2 btn-outline-info">Upload Your Agency's Info</a>
+      </div>
     {% endif %} <!-- end of has_agency -->
     {% endif %}
+
+
+    </div>
+
+  </div>
+
+  </div>
+
     {% if has_event %}
+    <div class="container">
+      <br>
+      <br>
       <h3>Registered Volunteering Events: </h3>
 
       <table class = "table table-bordered table-hover">
@@ -88,29 +143,28 @@
             </table>
 
     {% endif %}
-
-
-
-
-
+    </div>
 
 
 
     {% endif %} <!-- end of if is_personal_profile -->
 
         {% if has_posts %}
-
+        <div class="container">
+        <br>
+        <br>
+        <h4>&emsp;&emsp;Updates</h4>
 
         {% for post in posts %}
           {% if post.type == "volunteer" %}
-          <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>{{post.author}} pledged to attend <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}'s'</a> volunteering event for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> happening on {{post.date_posted}}</p>
+          <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>  {{post.author}} pledged to attend <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}'s'</a> volunteering event for <a href="/cause/{{ post.cause_profile }}">{{ post.cause_name }}</a> happening on {{post.date_posted}}</p>
 
           {% else %}
-          <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>{{post.author}} donated to help <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> on {{post.date_posted}}</p>
+          <p><a href="/profile/{{post.author}}"><img src="{{ user_info.profile.picture.url }}", class="avatar"></a>  {{post.author}} donated {{post.number_pledged}} {{post.item}} to help <a href="/agencyProfile/{{ post.agency_profile }}">{{ post.agency_name }}</a> on {{post.date_posted}}</p>
 
           {% endif %}
         {% endfor %}
-
+        </div>
       {% endif %}
     {% elif not is_an_account %}  <!-- end of if account, beginning of not account  -->
       <a href="{% url '' %}" class="btn mb-2 btn-outline-info">This user does not exist. Return to the home page.</a>

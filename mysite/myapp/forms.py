@@ -80,7 +80,7 @@ class AddVolunteerRequestForm(ModelForm):
 class ProfileForm(ModelForm):
     class Meta:
         model = Profile
-        exclude = ['user', 'requests_view_hide_completed', 'number_of_donations', 'number_of_volunteering_participations']
+        exclude = ['user', 'requests_view_hide_completed', 'number_of_donations', 'number_of_volunteering_participations', 'followers', 'following', 'agencies_following', 'number_of_items_donated', 'number_of_causes_contributed_to', 'number_of_agencies_contributed_to']
         #fields="__all__" #, "picture")
 
 
