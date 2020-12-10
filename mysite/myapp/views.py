@@ -21,6 +21,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import preprocessing
 le = preprocessing.LabelEncoder()
 from sklearn.metrics import r2_score
+from sklearn import svm
 import seaborn as sns
 from imblearn.over_sampling import SMOTE
 
@@ -1291,10 +1292,10 @@ def donationPredictor(request):
     if request.method == 'POST':
         city_id = request.POST.get('city_id')
         type_of_cause = request.POST.get('cause_type_id')
-
+        result = 0
         if city_id:
             city = City.objects.filter(display_name=city_id).values_list('population', flat=True)
-            print(city)
+            #print(city)
             if not type_of_cause:
                 df8 = pd.DataFrame()
 
@@ -1305,12 +1306,12 @@ def donationPredictor(request):
             cause_ids = (df['id'])
             cause_location_ids = (df['location_id'])
             df1 = pd.DataFrame(list(City.objects.all().filter(id__in=cause_location_ids).values()))
-            print("here's the new dataframe with city info to join on:")
-            print(df1)
+            #print("here's the new dataframe with city info to join on:")
+            #print(df1)
 
             df3 = pd.merge(df, df1, left_on='location_id', right_on='id')
-            print("here's the joined dataframe:")
-            print(df3)
+            #print("here's the joined dataframe:")
+            #print(df3)
 
             requests = Request_In_Progress.objects.all().filter(cause__in=cause_ids).values()
             volunteers = Volunteering.objects.all().filter(cause__in=cause_ids).values()
@@ -1342,21 +1343,46 @@ def donationPredictor(request):
             else:
                 df8 = pd.DataFrame()
 
-            if not df8.empty:
-                print("not emtp")
+
         if not city_id:
             if not type_of_cause:
                 df8 = pd.DataFrame()
 
     else:
         df8 = pd.DataFrame()
+        result=0
 
     cause_types = Cause.objects.values_list('type_of_cause', flat=True).distinct()
     cities = City.objects.values_list('display_name', flat=True)
+
+    if not df8.empty:
+        #x_train = dataTrain[['Temperature(K)', 'Pressure(ATM)']].to_numpy().reshape(-1,2)
+        df8['name'] = le.fit_transform(df8['name'])
+        X = df8[['population', 'name']].to_numpy().reshape(-1,2)
+        y = df8[['item']]
+        y = le.fit_transform(y)
+
+        lr_model = LogisticRegression()
+        lr_model.fit(X,y)
+        preds = lr_model.predict(X)
+        counter = 0
+        answer = (le.inverse_transform(preds))
+        word_counter = {}
+        for word in answer:
+            if word in word_counter:
+                word_counter[word] += 1
+            else:
+                word_counter[word] = 1
+
+        popular_words = sorted(word_counter, key = word_counter.get, reverse = True)
+        result = popular_words[:1]
+
+
     context = {
         "is_user": checkAuth(request),
         "cause_types": cause_types,
         "cities": cities,
+        "result": result,
         "df": df8,
     }
     return render(request, "main/donationPredictor.html", context=context)

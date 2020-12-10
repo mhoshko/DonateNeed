@@ -30,5 +30,8 @@
 	<input type="submit" value="Filter" />
 </select>
 </form>
+{% if result != 0 %}
+<div class="text-center">{{result}}</div>
+{% endif %}
 
 {% endblock %}
